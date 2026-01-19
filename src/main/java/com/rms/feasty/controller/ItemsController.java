@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/order")
-public class OrderController {
-    Logger logger = LogManager.getLogger(OrderController.class);
+public class ItemsController {
+    Logger logger = LogManager.getLogger(ItemsController.class);
 
     @PostMapping("/")
     public Order initiateOrder(@RequestBody Order order){
