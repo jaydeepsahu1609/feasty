@@ -4,14 +4,25 @@
 
 package com.rms.feasty.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.rms.feasty.constants.ItemStatusEnum;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
+
+    private String name;
+
+    private String description;
+
+    private double cost;
+
+    private ItemStatusEnum status; // in stock; out of stock
+
+    @OneToMany(mappedBy = "item")
+    private List<OrderItem> orderItems; // one item may be requested by many customer in a day; hence it belongs to many orderItems
 }

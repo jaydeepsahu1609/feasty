@@ -4,8 +4,28 @@
 
 package com.rms.feasty.controller;
 
-import org.springframework.stereotype.Controller;
+import com.rms.feasty.entity.Order;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
+@RequestMapping("/order")
 public class OrderController {
+    Logger logger = LogManager.getLogger(OrderController.class);
+
+    @PostMapping("/")
+    public Order initiateOrder(@RequestBody Order order){
+        logger.debug("Entry: initiateOrder");
+
+        logger.debug("{}", order);
+
+        logger.debug("Exit: initiateOrder");
+
+        return order;
+    }
+
 }
