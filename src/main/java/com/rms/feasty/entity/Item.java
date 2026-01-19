@@ -6,12 +6,11 @@ package com.rms.feasty.entity;
 
 import com.rms.feasty.constants.ItemStatusEnum;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
+@Table(name = "items")
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -32,7 +31,7 @@ public class Item {
         // no args constructor is must for an entity
     }
 
-    public Item(String name, String description,  double cost, ItemStatusEnum status) {
+    public Item(String name, String description, double cost, ItemStatusEnum status) {
         this.name = name;
         this.description = description;
         this.cost = cost;
