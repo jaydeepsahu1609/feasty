@@ -6,6 +6,8 @@ package com.rms.feasty.entity;
 
 import com.rms.feasty.constants.ItemStatusEnum;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -25,4 +27,15 @@ public class Item {
 
     @OneToMany(mappedBy = "item")
     private List<OrderItem> orderItems; // one item may be requested by many customer in a day; hence it belongs to many orderItems
+
+    protected Item() {
+        // no args constructor is must for an entity
+    }
+
+    public Item(String name, String description,  double cost, ItemStatusEnum status) {
+        this.name = name;
+        this.description = description;
+        this.cost = cost;
+        this.status = status;
+    }
 }
