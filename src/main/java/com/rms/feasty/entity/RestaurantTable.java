@@ -5,10 +5,12 @@
 package com.rms.feasty.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.List;
 
 @Entity
+@Getter
 public class RestaurantTable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

@@ -4,28 +4,39 @@
 
 package com.rms.feasty.controller;
 
-import com.rms.feasty.entity.Order;
+import com.rms.feasty.entity.Item;
+import com.rms.feasty.repository.ItemRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/items")
 public class ItemsController {
     Logger logger = LogManager.getLogger(ItemsController.class);
 
-    @PostMapping("/")
-    public Order initiateOrder(@RequestBody Order order){
-        logger.debug("Entry: initiateOrder");
+    private final ItemRepository itemRepository;
 
-        logger.debug("{}", order);
+    public ItemsController(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
+    }
 
-        logger.debug("Exit: initiateOrder");
+    @Operation(summary = "Get all items from inventory")
+    @GetMapping("/")
+    public List<Item> getAllItems(){
+        // TODO: add pagination
+        logger.debug("Entry: getAllItems");
 
-        return order;
+        List<Item> items = itemRepository.findAll(Sort.by(Sort.Order.asc("id")));
+
+        logger.debug("Returning {} items", items.size());
+        logger.debug("Exit: getAllItems");
+
+        return items;
     }
 
 }

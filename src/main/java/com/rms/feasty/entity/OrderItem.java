@@ -6,8 +6,10 @@ package com.rms.feasty.entity;
 
 import com.rms.feasty.constants.OrderItemStatusEnum;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
