@@ -44,15 +44,9 @@ public class OrdersController {
         Order savedOrder = orderService.addOrder(order);
 
         if (savedOrder == null) {
-            logger.error("Could not initiate order");
+            logger.error("Order initiation failed.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        logger.info(
-                "Order {} initiated successfully at table no. {}",
-                savedOrder.getId(),
-                savedOrder.getOrderTable()
-        );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedOrder);
     }

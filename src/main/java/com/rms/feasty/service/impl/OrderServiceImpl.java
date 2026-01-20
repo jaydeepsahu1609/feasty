@@ -37,7 +37,11 @@ public class OrderServiceImpl implements OrderService {
 
         try {
             savedOrder = orderRepository.save(order);
-            logger.info("Order {} initiated successfully.", savedOrder.getId());
+            logger.info(
+                    "Order {} initiated successfully at table no. {}",
+                    savedOrder.getId(),
+                    savedOrder.getOrderTable()
+            );
         }catch (Exception e){
             logger.error("Error while initiating the order. Reason- {}", e.getMessage());
         }
