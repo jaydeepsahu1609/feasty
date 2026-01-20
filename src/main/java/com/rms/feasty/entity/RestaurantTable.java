@@ -6,11 +6,13 @@ package com.rms.feasty.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class RestaurantTable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -20,4 +22,8 @@ public class RestaurantTable {
 
     @OneToMany(mappedBy = "orderTable")
     List<Order> orders; // one table, many orders in a day
+
+    public RestaurantTable(int capacity){
+        this.capacity = capacity;
+    }
 }
