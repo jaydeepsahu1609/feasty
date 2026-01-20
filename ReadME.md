@@ -2,10 +2,12 @@
 
 A mini-project that simulates a simple Restaurant Management System, designed to demonstrate the following concepts:
 
-- **Multi-threading, Concurrency, and Synchronization**
-- **JPA (Java Persistence API) for ORM**
-- **Database Design & Modeling**
-- **Spring Boot Application Development**
+- Multi-threading, Concurrency, and Synchronization
+- JPA (Java Persistence API) for ORM
+- Database Design & Modeling
+- Spring Boot Application Development
+
+--- 
 
 ## Application Flow
 The system handles customer interactions from table allocation to billing:
@@ -17,6 +19,7 @@ The initial design highlights the main components and their interactions:
 
 ![System Design](/docs/first-draft-design.png)
 
+--- 
 ## Plans
 
 #### Phase-1 : Core CRUD & Flow
@@ -52,3 +55,13 @@ The initial design highlights the main components and their interactions:
 * Notifications to staff when items are ready.
 * Notifications to Manager when inventory is about to exhaust.
 * TO BE ADDED
+
+---
+
+## API Doc
+
+This project uses `springdoc-openapi` for API-Documentation generation. Swagger doc will be available at [http://localhost:9090/swagger-ui/index.html](http://localhost:9090/swagger-ui/index.html)
+
+## Database
+
+This project uses H2 in-memory DB. H2 console can be accessed from [http://localhost:9090/h2-console](http://localhost:9090/h2-console)
