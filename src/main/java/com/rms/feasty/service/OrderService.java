@@ -4,8 +4,13 @@
 
 package com.rms.feasty.service;
 
+import com.rms.feasty.entity.Order;
 import org.springframework.stereotype.Service;
 
-@Service
+import java.util.List;
+
 public interface OrderService {
+    Order addOrder(Order order);
+
+    List<Order> getAllOpenOrders();
 }

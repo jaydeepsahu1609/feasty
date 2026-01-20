@@ -22,7 +22,7 @@ public class Order {
     @JoinColumn(name = "table_id")
     private RestaurantTable orderTable;
 
-    private OrderStatusEnum status; // open, closed
+    private OrderStatusEnum status = OrderStatusEnum.OPENED; // open (default), closed
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
