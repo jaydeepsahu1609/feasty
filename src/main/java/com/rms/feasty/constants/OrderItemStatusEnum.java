@@ -16,6 +16,6 @@ public enum OrderItemStatusEnum {
     SERVED(3), // item has been served to the customer
     CANCELLED(4); // either chef or the customer has canceled the order for some reason
 
-    private final int status;
+    private final int statusCode;
 
 }

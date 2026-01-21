@@ -4,8 +4,8 @@
 
 package com.rms.feasty.repository;
 
-import com.rms.feasty.constants.OrderStatusEnum;
 import com.rms.feasty.entity.Order;
+import com.rms.feasty.entity.OrderItem;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Integer> {
-    @EntityGraph(attributePaths = {"orderTable", "orderItems", "orderItems.item"})
-    List<Order> findAllByStatus(OrderStatusEnum status, Sort sort);
+public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
+    List<OrderItem> getAllByOrder(Order order, Sort sort);
 }
