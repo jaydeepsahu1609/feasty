@@ -26,7 +26,7 @@ public class Item {
 
     private String description;
 
-    private double cost;
+    private float cost;
 
     private ItemStatusEnum status; // in stock; out of stock
 
@@ -38,7 +38,7 @@ public class Item {
         // no args constructor is must for an entity
     }
 
-    public Item(String name, String description, double cost, ItemStatusEnum status) {
+    public Item(String name, String description, float cost, ItemStatusEnum status) {
         this.name = name;
         this.description = description;
         this.cost = cost;

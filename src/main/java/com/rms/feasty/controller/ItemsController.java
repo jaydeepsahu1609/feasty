@@ -5,13 +5,20 @@
 
 package com.rms.feasty.controller;
 
+import com.rms.feasty.dto.item.ItemResponse;
 import com.rms.feasty.entity.Item;
+import com.rms.feasty.mapper.ItemMapper;
 import com.rms.feasty.repository.ItemRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -27,17 +34,19 @@ public class ItemsController {
     }
 
     @Operation(summary = "Get all items from inventory")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fetched items successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/")
-    public List<Item> getAllItems(){
-        // TODO: add pagination
+    public ResponseEntity<List<ItemResponse>> getAllItems() {
         logger.debug("Entry: getAllItems");
 
         List<Item> items = itemRepository.findAll(Sort.by(Sort.Order.asc("id")));
-
         logger.debug("Returning {} items", items.size());
-        logger.debug("Exit: getAllItems");
 
-        return items;
+        List<ItemResponse> itemResponseList = ItemMapper.buildItemResponse(items);
+        return ResponseEntity.ok(itemResponseList);
     }
 
 }
