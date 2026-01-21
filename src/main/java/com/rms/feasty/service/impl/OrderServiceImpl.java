@@ -7,29 +7,30 @@ package com.rms.feasty.service.impl;
 
 import com.rms.feasty.constants.OrderItemStatusEnum;
 import com.rms.feasty.constants.OrderStatusEnum;
+import com.rms.feasty.dto.order.OrderItemRequest;
+import com.rms.feasty.dto.order.OrderItemResponse;
 import com.rms.feasty.dto.order.OrderRequest;
 import com.rms.feasty.dto.order.OrderResponse;
-import com.rms.feasty.entity.Item;
 import com.rms.feasty.entity.Order;
 import com.rms.feasty.entity.OrderItem;
-import com.rms.feasty.entity.RestaurantTable;
 import com.rms.feasty.exceptions.ItemNotFoundException;
 import com.rms.feasty.exceptions.OrderNotFoundException;
+import com.rms.feasty.mapper.OrderItemMapper;
 import com.rms.feasty.mapper.OrderMapper;
+import com.rms.feasty.repository.ItemRepository;
 import com.rms.feasty.repository.OrderItemRepository;
 import com.rms.feasty.repository.OrderRepository;
 import com.rms.feasty.repository.TableRepository;
 import com.rms.feasty.service.ItemService;
 import com.rms.feasty.service.OrderService;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,12 +40,14 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ItemService itemService;
+    private final ItemRepository itemRepository;
     private final TableRepository tableRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository, ItemService itemService, TableRepository tableRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository, ItemService itemService, ItemRepository itemRepository, TableRepository tableRepository) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.itemService = itemService;
+        this.itemRepository = itemRepository;
         this.tableRepository = tableRepository;
     }
 
@@ -92,63 +95,99 @@ public class OrderServiceImpl implements OrderService {
         return OrderMapper.buildOrderResponse(orders);
     }
 
-//    @Override
-//    public List<OrderItem> addItemsToOrder(int orderId, List<OrderItem> newOrderItems) throws OrderNotFoundException, ItemNotFoundException {
-//        logger.debug("Inside: addItemsToOrder");
-//        // validate if the order exists
-//        Order order = orderRepository.findById(orderId)
-//                .orElseThrow(() -> {
-//                    logger.error("Order {} does not exist.", orderId);
-//                    return new OrderNotFoundException();
-//                });
-//
-//        // populate order in the orderItems.
-//        newOrderItems.forEach(orderItem -> orderItem.setOrder(order));
-//
-//        // get Items from DB/Cache
-//        List<Integer> itemIds = newOrderItems.stream().map(oi -> oi.getItem().getId()).toList();
-//        if (itemIds.isEmpty()) {
-//            logger.debug("Ids list is empty. Returning an empty list");
-//            return Collections.emptyList();
-//        }
-//        List<Item> items = itemService.getItemsByIds(itemIds);
-//        if (items.size() < itemIds.size()) {
-//            logger.error("{}/{} items not found in DB", (itemIds.size() - items.size()), itemIds.size());
-//            throw new ItemNotFoundException();
-//        }
-//
-//        // populate item in orderItems object
-//        populateItemsInOrderItems(newOrderItems, items);
-//
-//        List<OrderItem> existingOrderItems = order.getOrderItems();
-//        updateItemsInExistingOrderItems(existingOrderItems, newOrderItems);
-//
-//        List<OrderItem> savedOrderItems = orderItemRepository.saveAll(newOrderItems);
-//        logger.info("Successfully added {} items to Order {}", savedOrderItems.size(), orderId);
-//
-//        return savedOrderItems;
-//    }
-//
-//    private void updateItemsInExistingOrderItems(List<OrderItem> existingOrderItems, List<OrderItem> newOrderItems) {
-//        Map<Integer, OrderItem> itemIdsToOrderItemMap = newOrderItems.stream().collect(Collectors.toMap(OrderItem::getId, oitem -> oitem, (oitem1, oitem2) -> oitem1));
-//
-//        for (OrderItem existingOrderItem : existingOrderItems) {
-//            int itemId = existingOrderItem.getItem().getId();
-//            if (itemIdsToOrderItemMap.containsKey(itemId)) {
-//                OrderItem newOrderItem = itemIdsToOrderItemMap.get(itemId);
-//                // increase pendingcount of existing order
-//                existingOrderItem.setPendingCount(existingOrderItem.getPendingCount() + newOrderItem.getPendingCount());
-//                // now the itemstatus is pending; till it is served to the customer
-//                existingOrderItem.setStatus(OrderItemStatusEnum.PENDING);
-//            }
-//        }
-//    }
-//
-//    private void populateItemsInOrderItems(List<OrderItem> orderItems, List<Item> items) {
-//        Map<Integer, Item> itemIdsToItemMap = items.stream().collect(Collectors.toMap(Item::getId, item -> item, (item1, item2) -> item1));
-//        Map<Integer, OrderItem> itemIdsToOrderItemMap = orderItems.stream().collect(Collectors.toMap(OrderItem::getId, oitem -> oitem, (oitem1, oitem2) -> oitem1));
-//
-//        itemIdsToOrderItemMap.forEach((itemId, orderItem) -> orderItem.setItem(itemIdsToItemMap.get(itemId)));
-//    }
+    @Override
+    @Transactional
+    public List<OrderItemResponse> addItemsToOrder(int orderId, List<OrderItemRequest> orderItemRequests) throws OrderNotFoundException, ItemNotFoundException {
+        logger.debug("Inside: addItemsToOrder");
+        // validate if the order exists
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> {
+                    logger.error("Order {} does not exist.", orderId);
+                    return new OrderNotFoundException();
+                });
+
+        List<OrderItem> updatedItems = new ArrayList<>();
+        List<OrderItem> orderItems = buildOrderItemsFromOrderItemsRequests(orderItemRequests);
+
+        List<OrderItem> existingOrderItems = orderItemRepository.getAllByOrder(order, Sort.by(Sort.Order.asc("id")));
+        if (!CollectionUtils.isEmpty(existingOrderItems)) {
+            // calculate DIFF with existing items & update quantity
+            // remove those items from orderItems list
+            List<OrderItem> itemsToBeUpdated = updateExistingItemsInOrder(existingOrderItems, orderItems);
+
+            if (!itemsToBeUpdated.isEmpty()) {
+                // update existing items
+                updatedItems.addAll(orderItemRepository.saveAll(itemsToBeUpdated));
+                logger.info("{} items updated in order no. {}", itemsToBeUpdated.size(), orderId);
+            }
+        }
+
+        // add new items; if-any
+        if (!CollectionUtils.isEmpty(orderItems)) {
+            updatedItems.addAll(orderItemRepository.saveAll(orderItems));
+            logger.info("Added {} items to order no. {}", orderItems.size(), orderId);
+        }
+
+        return OrderItemMapper.buildOrderItemResponse(updatedItems);
+    }
+
+    /**
+     * <ol>
+     * <li> calculate DIFF with <code>existingOrderItems</code> & <code>newOrderItems</code></li>
+     * <li> update quantity and status of existing items </li>
+     * <li> remove those items from <code>newOrderItems</code> list </li>
+     * </ol>
+     *
+     * @param existingOrderItems Existing items in the given order
+     * @param newOrderItems      New items added to the order
+     * @return {@link List} of {@link OrderItem} to be updated in the order
+     *
+     */
+    private List<OrderItem> updateExistingItemsInOrder(List<OrderItem> existingOrderItems, List<OrderItem> newOrderItems) {
+
+        Map<Integer, OrderItem> itemIdToExistingOrderItemMap = existingOrderItems.stream().collect(Collectors.toMap(
+                existingOrderItem -> existingOrderItem.getItem().getId(), existingOrderItem -> existingOrderItem, (oitem1, oitem2) -> oitem2
+        ));
+
+        Map<Integer, OrderItem> itemIdToNewOrderItemMap = newOrderItems.stream().collect(Collectors.toMap(
+                newOrderItem -> newOrderItem.getItem().getId(), newOrderItem -> newOrderItem, (oitem1, oitem2) -> oitem2
+        ));
+
+        // find intersection of both the maps, i.e., items that already exist in the order
+        itemIdToExistingOrderItemMap.keySet().retainAll(itemIdToNewOrderItemMap.keySet());
+        Set<Integer> existingItemIds = itemIdToExistingOrderItemMap.keySet();
+
+        // no existing orderitem found; return empty list
+        if (CollectionUtils.isEmpty(existingItemIds)) {
+            return Collections.emptyList();
+        }
+
+        List<OrderItem> itemsToBeUpdated = new ArrayList<>();
+        for (Integer itemId : existingItemIds) {
+            OrderItem existingOrderItem = itemIdToExistingOrderItemMap.get(itemId);
+            OrderItem newOrderItem = itemIdToNewOrderItemMap.get(itemId);
+
+            existingOrderItem.setPendingCount(existingOrderItem.getPendingCount() + newOrderItem.getPendingCount());
+            existingOrderItem.setStatus(OrderItemStatusEnum.PENDING);
+
+            itemsToBeUpdated.add(itemIdToExistingOrderItemMap.get(itemId));
+            newOrderItems.remove(newOrderItem); // remove from the list; as this will be updated not added
+        }
+        return itemsToBeUpdated;
+    }
+
+    private List<OrderItem> buildOrderItemsFromOrderItemsRequests(List<OrderItemRequest> orderItemRequests) {
+        List<OrderItem> orderItems = new ArrayList<>();
+        orderItemRequests.forEach(orderItemRequest -> orderItems.add(buildOrderItemFromOrderItemsRequest(orderItemRequest)));
+        return orderItems;
+    }
+
+    OrderItem buildOrderItemFromOrderItemsRequest(OrderItemRequest orderItemRequest) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setItem(itemRepository.getReferenceById(orderItemRequest.getItemId()));
+        orderItem.setOrder(orderRepository.getReferenceById(orderItemRequest.getOrderId()));
+        orderItem.setPendingCount(orderItemRequest.getQuantity());
+        return orderItem;
+    }
 
 }

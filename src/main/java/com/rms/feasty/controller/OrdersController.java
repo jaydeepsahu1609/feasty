@@ -5,10 +5,10 @@
 
 package com.rms.feasty.controller;
 
+import com.rms.feasty.dto.order.OrderItemRequest;
+import com.rms.feasty.dto.order.OrderItemResponse;
 import com.rms.feasty.dto.order.OrderRequest;
 import com.rms.feasty.dto.order.OrderResponse;
-import com.rms.feasty.entity.Order;
-import com.rms.feasty.entity.OrderItem;
 import com.rms.feasty.exceptions.ItemNotFoundException;
 import com.rms.feasty.exceptions.OrderNotFoundException;
 import com.rms.feasty.service.OrderService;
@@ -70,23 +70,26 @@ public class OrdersController {
         return ResponseEntity.ok(orders);
     }
 
-//    @Operation(summary = "Add item to an order")
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "200", description = "Order updated successfully"),
-//            @ApiResponse(responseCode = "404", description = "Order not found in DB"),
-//            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
-//    })
-//    @PostMapping("/{orderId}/items")
-//    public ResponseEntity<List<OrderItem>> addItemsToOrder(@PathVariable int orderId, @RequestBody List<OrderItem> orderItems) {
-//        logger.debug("Inside: addItemsToOrder");
-//
-//        try {
-//            List<OrderItem> updatedOrderItems = orderService.addItemsToOrder(orderId, orderItems);
-//            return ResponseEntity.ok(updatedOrderItems);
-//        } catch (Exception e) {
-//            if (e instanceof OrderNotFoundException || e instanceof ItemNotFoundException)
-//                return ResponseEntity.status(404).build();
-//            return ResponseEntity.status(500).build();
-//        }
-//    }
+    @Operation(summary = "Add items to an order")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Order updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Order not found in DB"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error"),
+    })
+    @PostMapping("/{orderId}/items")
+    public ResponseEntity<List<OrderItemResponse>> addItemsToOrder(@PathVariable int orderId, @RequestBody List<OrderItemRequest> orderItems) {
+        logger.debug("Inside: addItemsToOrder");
+
+        try {
+            List<OrderItemResponse> updatedOrderItems = orderService.addItemsToOrder(orderId, orderItems);
+            return ResponseEntity.ok(updatedOrderItems);
+        } catch (Exception e) {
+            if (e instanceof OrderNotFoundException || e instanceof ItemNotFoundException)
+                return ResponseEntity.status(404).build();
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    // get order details by ID
+    // DTO: DetailedOrderResponse
 }

@@ -5,6 +5,8 @@
 
 package com.rms.feasty.service;
 
+import com.rms.feasty.dto.order.OrderItemRequest;
+import com.rms.feasty.dto.order.OrderItemResponse;
 import com.rms.feasty.dto.order.OrderRequest;
 import com.rms.feasty.dto.order.OrderResponse;
 import com.rms.feasty.entity.Order;
@@ -19,5 +21,5 @@ public interface OrderService {
 
     List<OrderResponse> getAllOpenOrders();
 
-//    List<OrderItem> addItemsToOrder(int orderId, List<OrderItem> orderItems) throws OrderNotFoundException, ItemNotFoundException;
+    List<OrderItemResponse> addItemsToOrder(int orderId, List<OrderItemRequest> orderItems) throws OrderNotFoundException, ItemNotFoundException;
 }

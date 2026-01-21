@@ -11,12 +11,13 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum OrderItemStatusEnum {
-    PENDING(0), // to be acknowledged by chef; may be the chef is busy right now
-    PREPARING(1), // chef has acknowledged the item; cooking is in progress
-    READY(2), // item has been cooked; waiting to be picked up by the waiter
-    SERVED(3), // item has been served to the customer
-    CANCELLED(4); // either chef or the customer has canceled the order for some reason
+    PENDING(0, "PENDING"), // to be acknowledged by chef; may be the chef is busy right now
+    PREPARING(1, "PREPARING"), // chef has acknowledged the item; cooking is in progress
+    READY(2, "READY"), // item has been cooked; waiting to be picked up by the waiter
+    SERVED(3, "SERVED"), // item has been served to the customer
+    CANCELLED(4, "CANCELLED"); // either chef or the customer has canceled the order for some reason
 
     private final int statusCode;
+    private final String label;
 
 }
