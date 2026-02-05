@@ -3,7 +3,7 @@
  * Practice / learning project
  */
 
-package com.rms.feasty.controller;
+package com.rms.feasty.controller.rest;
 
 import com.rms.feasty.dto.item.ItemResponse;
 import com.rms.feasty.entity.Item;

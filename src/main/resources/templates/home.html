@@ -1,0 +1,53 @@
+<!--
+  ~ Copyright 2026 Jaydeep Sahu
+  ~ Practice / learning project
+  -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Restaurant Home</title>
+</head>
+<body>
+
+<h2>🍽 Restaurant Management</h2>
+
+<!-- Success message -->
+<div th:if="${successMessage}" style="color: green;">
+    <p th:text="${successMessage}"></p>
+</div>
+
+<!-- Error message -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<hr/>
+
+<h3>Start a New Order</h3>
+
+<form th:action="@{/ui/orders}" method="post">
+    <label>Select Table:</label>
+
+    <select name="tableId">
+        <option value="">NA (Takeaway)</option>
+
+        <option th:each="t : ${tables}"
+                th:value="${t}"
+                th:text="'Table ' + ${t}">
+        </option>
+    </select>
+
+    <br/><br/>
+    <button type="submit">Start Order</button>
+</form>
+
+<hr/>
+
+<h3>Existing Orders</h3>
+
+<a th:href="@{/ui/orders/open}">
+    <button>View Open Orders</button>
+</a>
+
+</body>
+</html>

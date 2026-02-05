@@ -3,7 +3,7 @@
  * Practice / learning project
  */
 
-package com.rms.feasty.controller;
+package com.rms.feasty.controller.rest;
 
 import com.rms.feasty.dto.order.OrderItemRequest;
 import com.rms.feasty.dto.order.OrderItemResponse;
@@ -91,5 +91,10 @@ public class OrdersController {
     }
 
     // get order details by ID
+    // params: id
     // DTO: DetailedOrderResponse
+
+    // serveItemsToOrder
+    // params: orderid, orderitemid
+    
 }
