@@ -5,10 +5,7 @@
 
 package com.rms.feasty.controller.rest;
 
-import com.rms.feasty.dto.order.OrderItemRequest;
-import com.rms.feasty.dto.order.OrderItemResponse;
-import com.rms.feasty.dto.order.OrderRequest;
-import com.rms.feasty.dto.order.OrderResponse;
+import com.rms.feasty.dto.order.*;
 import com.rms.feasty.exceptions.ItemNotFoundException;
 import com.rms.feasty.exceptions.OrderNotFoundException;
 import com.rms.feasty.service.OrderService;
@@ -51,7 +48,7 @@ public class OrdersController {
 
         if (savedOrder == null) {
             logger.error("Order initiation failed.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.internalServerError().build();
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedOrder);
@@ -85,16 +82,33 @@ public class OrdersController {
             return ResponseEntity.ok(updatedOrderItems);
         } catch (Exception e) {
             if (e instanceof OrderNotFoundException || e instanceof ItemNotFoundException)
-                return ResponseEntity.status(404).build();
-            return ResponseEntity.status(500).build();
+                return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
     // get order details by ID
     // params: id
     // DTO: DetailedOrderResponse
+    @Operation(summary = "Get order details")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Order details retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Order not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping("/{orderId}")
+    public ResponseEntity<DetailedOrderResponse> getOrderDetailsById(@PathVariable int orderId) {
+        logger.debug("Inside: getOrderDetailsById- {}", orderId);
 
-    // serveItemsToOrder
-    // params: orderid, orderitemid
-    
+        try {
+            DetailedOrderResponse orderResponses = orderService.getOrderDetailsById(orderId);
+            return ResponseEntity.ok(orderResponses);
+        } catch (Exception e) {
+            logger.error("Error while fetching details for order-{} : {}", orderId, e);
+            if (e instanceof OrderNotFoundException)
+                return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }

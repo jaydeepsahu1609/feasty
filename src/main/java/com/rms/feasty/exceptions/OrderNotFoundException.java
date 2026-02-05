@@ -11,4 +11,8 @@ public class OrderNotFoundException extends Exception {
     public OrderNotFoundException(String message){
         super(message);
     }
+
+    public OrderNotFoundException(int id){
+        super("Order with id " + id + " not found");
+    }
 }

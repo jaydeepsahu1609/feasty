@@ -1,0 +1,80 @@
+/*
+ * Copyright 2026 Jaydeep Sahu
+ * Practice / learning project
+ */
+
+/* Global */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    color: #2c2c2c;
+}
+
+h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+}
+
+.container {
+    margin-top: 40px;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #ff6b35;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #e85d2e;
+}
+
+.btn-outline-primary {
+    border-color: #ff6b35;
+    color: #ff6b35;
+}
+
+.btn-outline-primary:hover {
+    background-color: #ff6b35;
+    color: white;
+}
+
+/* Tables */
+.table {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table thead {
+    background-color: #343a40;
+    color: white;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+/* Status badges */
+.badge-open {
+    background-color: #198754;
+}
+
+.badge-pending {
+    background-color: #ffc107;
+    color: #000;
+}
+
+/* Navbar-ish header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}

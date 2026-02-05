@@ -33,7 +33,7 @@ public class HomePageController {
         this.restTemplate = restTemplate;
     }
 
-    @GetMapping("/home")
+    @GetMapping({"/", "/home"})
     public String home(Model model) {
         model.addAttribute("tables",
                 IntStream.rangeClosed(1, 10).boxed().toList());

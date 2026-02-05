@@ -7,10 +7,7 @@ package com.rms.feasty.service.impl;
 
 import com.rms.feasty.constants.OrderItemStatusEnum;
 import com.rms.feasty.constants.OrderStatusEnum;
-import com.rms.feasty.dto.order.OrderItemRequest;
-import com.rms.feasty.dto.order.OrderItemResponse;
-import com.rms.feasty.dto.order.OrderRequest;
-import com.rms.feasty.dto.order.OrderResponse;
+import com.rms.feasty.dto.order.*;
 import com.rms.feasty.entity.Order;
 import com.rms.feasty.entity.OrderItem;
 import com.rms.feasty.exceptions.ItemNotFoundException;
@@ -77,14 +74,6 @@ public class OrderServiceImpl implements OrderService {
         return OrderMapper.buildOrderResponse(order);
     }
 
-    private Order buildOrderFromOrderRequest(OrderRequest orderRequest) {
-        Order order = new Order();
-        order.setOrderTable(tableRepository.getReferenceById(orderRequest.getTableId()));
-        order.setStatus(OrderStatusEnum.OPENED);
-        return order;
-    }
-
-
     @Override
     public List<OrderResponse> getAllOpenOrders() {
         logger.debug("Inside: getAllOpenOrders");
@@ -131,6 +120,48 @@ public class OrderServiceImpl implements OrderService {
         return OrderItemMapper.buildOrderItemResponse(updatedItems);
     }
 
+    @Override
+    public DetailedOrderResponse getOrderDetailsById(int orderId) throws OrderNotFoundException {
+        logger.debug("Inside: getOrderDetailsById");
+
+        List<OrderDetailRow> orderDetailRows = orderRepository.getDetailedOrderById(orderId);
+        if (orderDetailRows.isEmpty()) {
+            throw new OrderNotFoundException(orderId);
+        }
+
+        DetailedOrderResponse response = buildDetailedOrderResponseFromOrderDetailRows(orderDetailRows);
+        if (response != null)
+            logger.info("Returning details of order-{}", orderId);
+        else
+            throw new OrderNotFoundException(orderId);
+
+        return response;
+    }
+
+    // -------------------------- HELPER METHODS --------------------------
+
+    private Order buildOrderFromOrderRequest(OrderRequest orderRequest) {
+        Order order = new Order();
+        order.setOrderTable(tableRepository.getReferenceById(orderRequest.getTableId()));
+        order.setStatus(OrderStatusEnum.OPENED);
+        return order;
+    }
+
+    private List<OrderItem> buildOrderItemsFromOrderItemsRequests(List<OrderItemRequest> orderItemRequests) {
+        List<OrderItem> orderItems = new ArrayList<>();
+        orderItemRequests.forEach(orderItemRequest -> orderItems.add(buildOrderItemFromOrderItemsRequest(orderItemRequest)));
+        return orderItems;
+    }
+
+    OrderItem buildOrderItemFromOrderItemsRequest(OrderItemRequest orderItemRequest) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setItem(itemRepository.getReferenceById(orderItemRequest.getItemId()));
+        orderItem.setOrder(orderRepository.getReferenceById(orderItemRequest.getOrderId()));
+        orderItem.setPendingCount(orderItemRequest.getQuantity());
+        return orderItem;
+    }
+
+
     /**
      * <ol>
      * <li> calculate DIFF with <code>existingOrderItems</code> & <code>newOrderItems</code></li>
@@ -176,18 +207,54 @@ public class OrderServiceImpl implements OrderService {
         return itemsToBeUpdated;
     }
 
-    private List<OrderItem> buildOrderItemsFromOrderItemsRequests(List<OrderItemRequest> orderItemRequests) {
-        List<OrderItem> orderItems = new ArrayList<>();
-        orderItemRequests.forEach(orderItemRequest -> orderItems.add(buildOrderItemFromOrderItemsRequest(orderItemRequest)));
-        return orderItems;
+    private DetailedOrderResponse buildDetailedOrderResponseFromOrderDetailRows(List<OrderDetailRow> orderDetailRows) {
+        if (CollectionUtils.isEmpty(orderDetailRows)) {
+            return null;
+        }
+        DetailedOrderResponse detailedOrderResponse = new DetailedOrderResponse();
+
+        // populate order related details
+        detailedOrderResponse.setOrderId(orderDetailRows.get(0).getOrderId());
+        detailedOrderResponse.setTableId(orderDetailRows.get(0).getTableId());
+        detailedOrderResponse.setStatus(orderDetailRows.get(0).getStatus().getLabel());
+        detailedOrderResponse.setCustomerId(orderDetailRows.get(0).getCustomerId());
+
+        // populate order-items related details
+        List<DetailedOrderItemResponse> detailedOrderItems = new ArrayList<>();
+
+        for (OrderDetailRow orderDetailRow : orderDetailRows) {
+            DetailedOrderItemResponse response = buildDetailedOrderItemResponseFromOrderDetailRow(orderDetailRow);
+            if(response != null)
+                detailedOrderItems.add(response);
+        }
+        detailedOrderResponse.setOrderItems(detailedOrderItems);
+
+        return detailedOrderResponse;
     }
 
-    OrderItem buildOrderItemFromOrderItemsRequest(OrderItemRequest orderItemRequest) {
-        OrderItem orderItem = new OrderItem();
-        orderItem.setItem(itemRepository.getReferenceById(orderItemRequest.getItemId()));
-        orderItem.setOrder(orderRepository.getReferenceById(orderItemRequest.getOrderId()));
-        orderItem.setPendingCount(orderItemRequest.getQuantity());
-        return orderItem;
+    private DetailedOrderItemResponse buildDetailedOrderItemResponseFromOrderDetailRow(OrderDetailRow orderDetailRow) {
+        if(orderDetailRow.getOrderItemid() == null)
+            return null;
+
+        DetailedOrderItemResponse detailedOrderItemResponse = new DetailedOrderItemResponse();
+
+        // populate order-item related fields
+        detailedOrderItemResponse.setId(orderDetailRow.getOrderItemid());
+        detailedOrderItemResponse.setItemsCount(orderDetailRow.getCount());
+        detailedOrderItemResponse.setPendingItems(orderDetailRow.getPendingItems());
+        detailedOrderItemResponse.setStatus(orderDetailRow.getStatus().getLabel());
+
+        // populate item related fields
+        ItemResponse itemResponse = new ItemResponse();
+        itemResponse.setItemId(orderDetailRow.getItemId());
+        itemResponse.setName(orderDetailRow.getName());
+        itemResponse.setDescription(orderDetailRow.getDescription());
+        itemResponse.setCost(orderDetailRow.getCost());
+
+        detailedOrderItemResponse.setItem(itemResponse);
+
+        return detailedOrderItemResponse;
     }
+
 
 }
