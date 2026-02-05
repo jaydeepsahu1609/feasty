@@ -12,7 +12,7 @@ public class OrderItemResponse {
     private int id;
     private int orderId;
     private int itemId;
-    private int itemsServed;
+    private int count;
     private int pendingItems;
     private String status;
 }

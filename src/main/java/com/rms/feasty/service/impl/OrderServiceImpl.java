@@ -222,12 +222,16 @@ public class OrderServiceImpl implements OrderService {
         // populate order-items related details
         List<DetailedOrderItemResponse> detailedOrderItems = new ArrayList<>();
 
+        float totalcost = 0f;
         for (OrderDetailRow orderDetailRow : orderDetailRows) {
             DetailedOrderItemResponse response = buildDetailedOrderItemResponseFromOrderDetailRow(orderDetailRow);
-            if(response != null)
+            if(response != null) {
                 detailedOrderItems.add(response);
+                totalcost += (response.getItemsCount() + response.getPendingItems()) * response.getItem().getCost();
+            }
         }
         detailedOrderResponse.setOrderItems(detailedOrderItems);
+        detailedOrderResponse.setTotal(totalcost);
 
         return detailedOrderResponse;
     }

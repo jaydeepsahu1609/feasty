@@ -6,14 +6,11 @@
 package com.rms.feasty.mapper;
 
 import com.rms.feasty.dto.order.OrderItemResponse;
-import com.rms.feasty.dto.order.OrderResponse;
-import com.rms.feasty.entity.Order;
 import com.rms.feasty.entity.OrderItem;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class OrderItemMapper {
     public static OrderItemResponse buildOrderItemResponse(OrderItem orderItem) {
@@ -21,7 +18,7 @@ public class OrderItemMapper {
         orderItemResponse.setId(orderItem.getId());
         orderItemResponse.setOrderId(orderItem.getOrder().getId());
         orderItemResponse.setItemId(orderItem.getItem().getId());
-        orderItemResponse.setItemsServed(orderItem.getCount());
+        orderItemResponse.setCount(orderItem.getCount());
         orderItemResponse.setPendingItems(orderItem.getPendingCount());
         orderItemResponse.setStatus(orderItem.getStatus().getLabel());
         return orderItemResponse;

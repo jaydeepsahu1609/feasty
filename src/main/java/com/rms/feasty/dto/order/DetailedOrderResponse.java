@@ -17,6 +17,7 @@ public class DetailedOrderResponse {
     private Integer tableId;
     private String status = OrderStatusEnum.OPENED.getLabel();
     private Integer customerId;
+    private float total;
 
     // order-items
     private List<DetailedOrderItemResponse> orderItems;
