@@ -3,9 +3,9 @@
   ~ Practice / learning project
 -->
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/head :: common-head('Order #' + ${order.id})">
+<head th:replace="~{fragments/head :: common-head('Order #' + ${order.orderId})}">
 </head>
 
 <body>
@@ -45,6 +45,7 @@
             <th>Qty Served</th>
             <th>Pending</th>
             <th>Price</th>
+            <th>Total</th>
             <th></th>
         </tr>
         </thead>
@@ -56,11 +57,16 @@
                 <small class="text-muted" th:text="${oi.item.description}"></small>
             </td>
 
-            <td th:text="${oi.itemsCount}"></td>
+            <td id="${order.orderId}-count" th:text="${oi.itemsCount}"></td>
             <td th:text="${oi.pendingItems}"></td>
 
             <td>
                 ₹ <span th:text="${#numbers.formatDecimal(oi.item.cost, 1, 2)}"></span>
+            </td>
+
+            <td>
+                ₹ <span
+                    th:text="${#numbers.formatDecimal((oi.itemsCount + oi.pendingItems) * oi.item.cost, 1, 2)}"></span>
             </td>
 
             <td>
@@ -74,11 +80,41 @@
         </tr>
 
         <tr class="fw-bold table-light">
-            <td colspan="3" class="text-end">
-                Total Bill Amount:
+            <td colspan="4" class="text-end">
+                Total Amount:
             </td>
             <td>
                 ₹ <span th:text="${order.getTotal()}">0.00</span>
+            </td>
+            <td></td>
+        </tr>
+
+        <tr class="fw-bold table-light">
+            <td colspan="4" class="text-end">
+                CGST (2.5%):
+            </td>
+            <td>
+                ₹ <span th:text="${order.getTotal() * 0.025}">0.00</span>
+            </td>
+            <td></td>
+        </tr>
+
+        <tr class="fw-bold table-light">
+            <td colspan="4" class="text-end">
+                SGST (2.5%):
+            </td>
+            <td>
+                ₹ <span th:text="${order.getTotal() * 0.025}">0.00</span>
+            </td>
+            <td></td>
+        </tr>
+
+        <tr class="fw-bold table-light">
+            <td colspan="4" class="text-end">
+                Total Amount:
+            </td>
+            <td>
+                ₹ <span th:text="${order.getTotal() + (order.getTotal() * 0.05)}">0.00</span>
             </td>
             <td></td>
         </tr>

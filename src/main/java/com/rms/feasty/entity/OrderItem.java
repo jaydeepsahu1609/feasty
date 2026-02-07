@@ -13,6 +13,7 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -21,20 +22,18 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "order_id")
     @JsonIgnore
-    @Setter
+
     private Order order;
 
     @ManyToOne
     @JoinColumn(name = "item_id")
-    @Setter
+
     private Item item;
 
     private int count; // quantity of items served to the customer so far (doesn't include pending)
 
-    @Setter
     private int pendingCount; // quantity of items to be served to customer
 
-    @Setter
     private OrderItemStatusEnum status = OrderItemStatusEnum.PENDING;
 
 }

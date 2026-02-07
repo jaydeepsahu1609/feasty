@@ -157,7 +157,8 @@ public class OrderServiceImpl implements OrderService {
         OrderItem orderItem = new OrderItem();
         orderItem.setItem(itemRepository.getReferenceById(orderItemRequest.getItemId()));
         orderItem.setOrder(orderRepository.getReferenceById(orderItemRequest.getOrderId()));
-        orderItem.setPendingCount(orderItemRequest.getQuantity());
+        // orderItem.setPendingCount(orderItemRequest.getQuantity()); To be fixed- once chef view is implemented
+        orderItem.setCount(orderItemRequest.getQuantity()); // workaround till chef-view is implemented
         return orderItem;
     }
 
@@ -227,7 +228,7 @@ public class OrderServiceImpl implements OrderService {
             DetailedOrderItemResponse response = buildDetailedOrderItemResponseFromOrderDetailRow(orderDetailRow);
             if(response != null) {
                 detailedOrderItems.add(response);
-                totalcost += (response.getItemsCount() + response.getPendingItems()) * response.getItem().getCost();
+                totalcost += (response.getItemsCount()) * response.getItem().getCost();
             }
         }
         detailedOrderResponse.setOrderItems(detailedOrderItems);
