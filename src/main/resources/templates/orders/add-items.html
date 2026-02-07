@@ -10,9 +10,36 @@
 <body>
 
 <div class="container mt-4">
-    <h3>Add Items to Order</h3>
 
     <form th:action="@{/ui/orders/{id}/items(id=${orderId})}" method="post">
+
+
+        <div class="sticky-top bg-light border-bottom" style="z-index: 1020;">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center p-1">
+                <h3 class="mb-0">Add Items to Order</h3>
+
+                <div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-cart-plus"></i> Add to Order
+                    </button>
+
+                    <a th:href="@{/ui/orders/{id}(id=${orderId})}"
+                       class="btn btn-secondary ms-2">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+
+            <!-- Search (future) -->
+            <div class="pt-0 pb-1">
+                <input class="form-control"
+                       type="search"
+                       placeholder="Search item by category or name"
+                       aria-label="Search">
+            </div>
+        </div>
 
         <table class="table table-hover">
             <thead>
@@ -31,7 +58,7 @@
                 <td th:text="${item.price}"></td>
                 <td>
                     <input type="number"
-                           class="form-control"
+                           class="form-control-sm"
                            min="0"
                            value="0"
                            th:name="__${item.itemId}__"/>
@@ -39,15 +66,6 @@
             </tr>
             </tbody>
         </table>
-
-        <button type="submit" class="btn btn-success">
-            <i class="bi bi-cart-plus"></i> Add to Order
-        </button>
-
-        <a th:href="@{/ui/orders/{id}(id=${orderId})}"
-           class="btn btn-secondary ms-2">
-            Cancel
-        </a>
 
     </form>
 </div>

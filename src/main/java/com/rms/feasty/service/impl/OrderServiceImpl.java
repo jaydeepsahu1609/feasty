@@ -199,7 +199,9 @@ public class OrderServiceImpl implements OrderService {
             OrderItem existingOrderItem = itemIdToExistingOrderItemMap.get(itemId);
             OrderItem newOrderItem = itemIdToNewOrderItemMap.get(itemId);
 
-            existingOrderItem.setPendingCount(existingOrderItem.getPendingCount() + newOrderItem.getPendingCount());
+//            existingOrderItem.setPendingCount(existingOrderItem.getPendingCount() + newOrderItem.getPendingCount());
+//            FIXME: workaround till chef-view is not implemented
+            existingOrderItem.setCount(existingOrderItem.getCount() + newOrderItem.getCount());
             existingOrderItem.setStatus(OrderItemStatusEnum.PENDING);
 
             itemsToBeUpdated.add(itemIdToExistingOrderItemMap.get(itemId));

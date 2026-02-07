@@ -9,11 +9,15 @@
 </head>
 
 <body>
+
 <div class="container">
+    <!-- Flash message -->
+    <div th:if="${successMessage}" class="alert alert-success mt-4" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger mt-4" th:text="${errorMessage}"></div>
+
 
     <div class="app-header">
         <h2>Order #<span th:text="${order.orderId}"></span></h2>
-
         <div>
             <a href="/ui/orders/open" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back
@@ -26,101 +30,137 @@
         </div>
     </div>
 
-    <div class="card p-3 mb-4">
-        <p>
-            <b>Table:</b>
-            <span th:text="${order.tableId != null ? order.tableId : 'TAKEAWAY'}"></span>
-        </p>
-        <p>
-            <b>Status:</b>
-            <span class="badge badge-open" th:text="${order.status}"></span>
-        </p>
-    </div>
+    <form th:action="@{/ui/orders/{id}/items(id=${order.orderId})}" method="post">
+        <div class="card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
 
-    <!-- ===== TOTAL CALCULATION (SAFE) ===== -->
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Item</th>
-            <th>Qty Served</th>
-            <th>Pending</th>
-            <th>Price</th>
-            <th>Total</th>
-            <th></th>
-        </tr>
-        </thead>
+                <!-- Left: Order meta -->
+                <div>
+                    <p class="mb-1">
+                        <b>Table:</b>
+                        <span th:text="${order.tableId != null ? order.tableId : 'TAKEAWAY'}"></span>
+                    </p>
+                    <p class="mb-0">
+                        <b>Status:</b>
+                        <span class="badge badge-open" th:text="${order.status}"></span>
+                    </p>
+                </div>
 
-        <tbody>
-        <tr th:each="oi : ${order.orderItems}">
-            <td>
-                <b th:text="${oi.item.name}"></b><br/>
-                <small class="text-muted" th:text="${oi.item.description}"></small>
-            </td>
+                <!-- Right: Update button -->
+                <div>
+                    <button type="submit" class="btn btn-success px-4">
+                        Update Order
+                    </button>
+                    <!-- TODO: Disable this button if there are no change -->
+                </div>
 
-            <td id="${order.orderId}-count" th:text="${oi.itemsCount}"></td>
-            <td th:text="${oi.pendingItems}"></td>
+            </div>
+        </div>
 
-            <td>
-                ₹ <span th:text="${#numbers.formatDecimal(oi.item.cost, 1, 2)}"></span>
-            </td>
 
-            <td>
-                ₹ <span
-                    th:text="${#numbers.formatDecimal((oi.itemsCount + oi.pendingItems) * oi.item.cost, 1, 2)}"></span>
-            </td>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty Served</th>
+                <th>Pending</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+            </thead>
 
-            <td>
-                <button class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-plus"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger">
-                    <i class="bi bi-dash"></i>
-                </button>
-            </td>
-        </tr>
+            <tbody>
 
-        <tr class="fw-bold table-light">
-            <td colspan="4" class="text-end">
-                Total Amount:
-            </td>
-            <td>
-                ₹ <span th:text="${order.getTotal()}">0.00</span>
-            </td>
-            <td></td>
-        </tr>
+            <tr th:each="oi : ${order.orderItems}">
 
-        <tr class="fw-bold table-light">
-            <td colspan="4" class="text-end">
-                CGST (2.5%):
-            </td>
-            <td>
-                ₹ <span th:text="${order.getTotal() * 0.025}">0.00</span>
-            </td>
-            <td></td>
-        </tr>
+                <td>
+                    <b th:text="${oi.item.name}"></b><br/>
+                    <small class="text-muted" th:text="${oi.item.description}"></small>
+                </td>
 
-        <tr class="fw-bold table-light">
-            <td colspan="4" class="text-end">
-                SGST (2.5%):
-            </td>
-            <td>
-                ₹ <span th:text="${order.getTotal() * 0.025}">0.00</span>
-            </td>
-            <td></td>
-        </tr>
+                <td th:text="${oi.itemsCount}"></td>
 
-        <tr class="fw-bold table-light">
-            <td colspan="4" class="text-end">
-                Total Amount:
-            </td>
-            <td>
-                ₹ <span th:text="${order.getTotal() + (order.getTotal() * 0.05)}">0.00</span>
-            </td>
-            <td></td>
-        </tr>
-        </tbody>
-    </table>
+                <td th:id="|pending-count-${oi.item.itemId}|"
+                    th:text="${oi.pendingItems}">
+                </td>
+
+                <td>
+                    ₹ <span th:text="${#numbers.formatDecimal(oi.item.cost, 1, 2)}"></span>
+                </td>
+
+                <td>
+                    ₹ <span
+                        th:text="${#numbers.formatDecimal((oi.itemsCount + oi.pendingItems) * oi.item.cost, 1, 2)}"></span>
+                </td>
+
+                <td>
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary plus"
+                            th:data-item-id="${oi.item.itemId}"
+                            data-delta="1">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-sm btn-outline-danger minus"
+                            th:data-item-id="${oi.item.itemId}"
+                            data-delta="-1">
+                        <i class="bi bi-dash"></i>
+                    </button>
+                </td>
+                <input type="hidden" th:id="|pending-input-${oi.item.itemId}|" th:name="__${oi.item.itemId}__"
+                       th:value="${oi.pendingItems}">
+            </tr>
+
+            <tr class="fw-bold table-light">
+                <td colspan="4" class="text-end">
+                    Total :
+                </td>
+                <td>
+                    ₹ <span th:text="${#numbers.formatDecimal(order.getTotal(), 1, 2)}">0.00</span>
+                </td>
+                <td></td>
+            </tr>
+
+            <tr class="fw-bold table-light">
+                <td colspan="4" class="text-end">
+                    CGST (2.5%):
+                </td>
+                <td>
+                    ₹ <span th:text="${#numbers.formatDecimal(order.getTotal() * 0.025, 1, 2)}">0.00</span>
+                </td>
+                <td></td>
+            </tr>
+
+            <tr class="fw-bold table-light">
+                <td colspan="4" class="text-end">
+                    SGST (2.5%):
+                </td>
+                <td>
+                    ₹ <span th:text="${#numbers.formatDecimal(order.getTotal() * 0.025, 1, 2)}">0.00</span>
+                </td>
+                <td></td>
+            </tr>
+
+            <tr class="fw-bold table-light">
+                <td colspan="4" class="text-end">
+                    Total Amount After Tax:
+                </td>
+                <td>
+                    ₹ <span th:text="${order.getTotal() + (order.getTotal() * 0.05)}">0.00</span>
+                </td>
+                <td></td>
+            </tr>
+
+
+            </tbody>
+        </table>
+    </form>
 
 </div>
+
+<script th:src="@{/js/order-details.js}"></script>
+
 </body>
 </html>
