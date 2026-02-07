@@ -10,6 +10,7 @@ This project serves as a hands-on exploration of:
 - API Design
 - Concurrency & Synchronization
 - Spring Boot & JPA
+- Spring Security
 - Scalable and maintainable architecture
 
 This project is built as a **learning-focused, production-inspired system**, not a CRUD demo.  
@@ -83,6 +84,10 @@ The cashier handles billing and payment status.
 - Clear separation of concerns
 - Graceful error handling and recovery
 - Extensible data model for future features
+- Role-based authentication for staff members  
+  _(Waiter, Chef, Manager, Cashier)_
+- Dedicated role-specific views and permissions  
+  _(Each role can access only the features relevant to their responsibilities)_
 
 ---
 
@@ -120,6 +125,9 @@ The cashier handles billing and payment status.
 - Item running out of stock
 - Order preparation delay
 - SLA breach for preparation time
+
+#### Authentication
+- Role-based authentication
 
 ---
 
