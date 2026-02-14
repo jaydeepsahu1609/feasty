@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "items")
@@ -43,5 +44,26 @@ public class Item {
         this.description = description;
         this.cost = cost;
         this.status = status;
+    }
+
+    public Item(int id, String name, String description, float cost, ItemStatusEnum status) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.cost = cost;
+        this.status = status;
+    }
+
+    // Proper equals & hashCode for JPA entity
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Item that)) return false;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

@@ -18,7 +18,6 @@ import com.rms.feasty.repository.ItemRepository;
 import com.rms.feasty.repository.OrderItemRepository;
 import com.rms.feasty.repository.OrderRepository;
 import com.rms.feasty.repository.TableRepository;
-import com.rms.feasty.service.ItemService;
 import com.rms.feasty.service.OrderService;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.LogManager;
@@ -36,14 +35,12 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final ItemService itemService;
     private final ItemRepository itemRepository;
     private final TableRepository tableRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository, ItemService itemService, ItemRepository itemRepository, TableRepository tableRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderItemRepository orderItemRepository, ItemRepository itemRepository, TableRepository tableRepository) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
-        this.itemService = itemService;
         this.itemRepository = itemRepository;
         this.tableRepository = tableRepository;
     }

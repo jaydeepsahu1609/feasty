@@ -5,10 +5,11 @@
 
 package com.rms.feasty.dto.order;
 
-import com.rms.feasty.constants.OrderStatusEnum;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class OrderRequest {
     private Integer tableId;
     private Integer customerId;
