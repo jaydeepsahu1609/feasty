@@ -30,6 +30,7 @@ public class RestaurantTable {
         this.capacity = capacity;
     }
     public RestaurantTable(int id, Integer capacity) {
-        this.capacity = id;
+        this.capacity = capacity;
+        this.id = id;
     }
 }
