@@ -1,0 +1,72 @@
+@startuml
+class Customer {
+    -int id
+    -String firstName
+    -String lastName
+    -String email
+    -String contact
+    --
+    +List<Order> orders
+}
+
+class Order {
+    -Integer id
+    -OrderStatusEnum status
+    --
+    +RestaurantTable orderTable
+    +List<OrderItem> orderItems
+    +Customer customer
+    --
+    +boolean equals(Object o)
+}
+
+class OrderItem {
+    -int id
+    -int count
+    -int pendingCount
+    -OrderItemStatusEnum status
+    --
+    +Order order
+    +Item item
+}
+
+class Item {
+    -Integer id
+    -String name
+    -String description
+    -float cost
+    -ItemStatusEnum status
+    --
+    +List<OrderItem> orderItems
+    --
+    +Item()
+    +Item(String name, String description, float cost, ItemStatusEnum status)
+    +Item(int id, String name, String description, float cost, ItemStatusEnum status)
+    +boolean equals(Object o)
+    +int hashCode()
+}
+
+class RestaurantTable {
+    -Integer id
+    -Integer capacity
+    --
+    +List<Order> orders
+    --
+    +RestaurantTable(int capacity)
+    +RestaurantTable(int id, Integer capacity)
+}
+
+class Bill {
+    -int id
+}
+
+class Transaction {
+    -int id
+}
+
+Customer "1" -- "*" Order : has
+RestaurantTable "1" -- "*" Order : has
+Order "1" -- "*" OrderItem : contains
+Item "1" -- "*" OrderItem : part of
+
+@enduml
